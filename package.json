@@ -17,19 +17,12 @@
       {
         "command": "forge.authenticate",
         "title": "Forge: Authenticate"
+      },
+      {
+        "command": "forge.listSites",
+        "title": "Forge: List Sites"
       }
     ],
-    "configuration": {
-      "type": "object",
-      "title": "Forge Quick Access Configuration",
-      "properties": {
-        "forgeQuickAccess.secrets": {
-          "type": "object",
-          "default": {},
-          "description": "Store Forge API keys and other secrets"
-        }
-      }
-    },
     "activationEvents": ["onCommand:forge.authenticate"]
   },
   "scripts": {
