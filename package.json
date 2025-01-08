@@ -2,6 +2,7 @@
   "name": "forge-quick-access",
   "displayName": "forge-quick-access",
   "description": "",
+  "publisher": "beachio",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.96.0"
@@ -14,10 +15,22 @@
   "contributes": {
     "commands": [
       {
-        "command": "forge-quick-access.helloWorld",
-        "title": "Hello World"
+        "command": "forge.authenticate",
+        "title": "Forge: Authenticate"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Forge Quick Access Configuration",
+      "properties": {
+        "forgeQuickAccess.secrets": {
+          "type": "object",
+          "default": {},
+          "description": "Store Forge API keys and other secrets"
+        }
+      }
+    },
+    "activationEvents": ["onCommand:forge.authenticate"]
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
