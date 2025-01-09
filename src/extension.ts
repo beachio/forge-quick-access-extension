@@ -1,48 +1,51 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import axios from 'axios';
+import * as fs from 'fs';
+import FormData from 'form-data';
 
 export async function authenticate(secretStorage: vscode.SecretStorage) {
-	const email = await vscode.window.showInputBox({
-			prompt: "Enter your Forge email",
-			placeHolder: "you@example.com"
-	});
+  const email = await vscode.window.showInputBox({
+    prompt: "Enter your Forge email",
+    placeHolder: "you@example.com"
+  });
 
-	if (!email) {
-			vscode.window.showErrorMessage("Email is required.");
-			return;
-	}
+  if (!email) {
+    vscode.window.showErrorMessage("Email is required.");
+    return;
+  }
 
-	const password = await vscode.window.showInputBox({
-			prompt: "Enter your Forge password",
-			password: true
-	});
+  const password = await vscode.window.showInputBox({
+    prompt: "Enter your Forge password",
+    password: true
+  });
 
-	if (!password) {
-			vscode.window.showErrorMessage("Password is required.");
-			return;
-	}
+  if (!password) {
+    vscode.window.showErrorMessage("Password is required.");
+    return;
+  }
 
-	try {
-			const response = await axios.post('https://getforge.com/api/v2/cli/login', {
-					email,
-					password
-			});
+  try {
+    const response = await axios.post('https://getforge.com/api/v2/cli/login', {
+      email,
+      password
+    });
 
-			const accessToken = response.data.access_token;
-			await secretStorage.store('forgeEmail', email);
-			await secretStorage.store('forgeAccessToken', accessToken);
+    const accessToken = response.data.access_token;
+    await secretStorage.store('forgeAccessToken', accessToken);
 
-			vscode.window.showInformationMessage("Authentication successful!");
-	} catch (error) {
-			if (axios.isAxiosError(error)) {
-				vscode.window.showErrorMessage(`Authentication failed: ${error.message}`);
-			} else {
-				vscode.window.showErrorMessage('Authentication failed: An unknown error occurred.');
-			}
-	}
+    const config = vscode.workspace.getConfiguration('forgeQuickAccess');
+    await config.update('forgeToken', accessToken, vscode.ConfigurationTarget.Global);
+
+    vscode.window.showInformationMessage("Authentication successful!");
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      vscode.window.showErrorMessage(`Authentication failed: ${error.message}`);
+    } else {
+      vscode.window.showErrorMessage('Authentication failed: An unknown error occurred.');
+    }
+  }
 }
+
 
 export async function listSites(secretStorage: vscode.SecretStorage) {
 	const token = vscode.workspace.getConfiguration().get('forgeQuickAccess.accountToken');
@@ -56,44 +59,86 @@ export async function listSites(secretStorage: vscode.SecretStorage) {
 			);
 
 			if (selectedSite) {
-					vscode.window.showInformationMessage(`Selected site: ${selectedSite}`);
-					await secretStorage.store('selectedSite', selectedSite);
+				vscode.window.showInformationMessage(`Selected site: ${selectedSite}`);
+				await secretStorage.store('forgeSite', selectedSite);
 			}
 	} catch (error) {
 		console.log('error', error)
 		if (axios.isAxiosError(error)) {
-			vscode.window.showErrorMessage(`Authentication failed: ${error.message}`);
+			vscode.window.showErrorMessage(`List Sites failed: ${error.message}`);
 		} else {
-			vscode.window.showErrorMessage('Authentication failed: An unknown error occurred.');
+			vscode.window.showErrorMessage('List Sites failed: An unknown error occurred.');
 		}
 	}
 }
 
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function deploy(secretStorage: vscode.SecretStorage) {
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+	const domain = await secretStorage.get('forgeSite');
+  if (!workspaceFolder) {
+    vscode.window.showErrorMessage("No workspace folder found.");
+    return;
+  }
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "forge-quick-access" is now active!');
+  const path = await vscode.window.showInputBox({
+    prompt: "Enter the path to the zip file",
+    placeHolder: 'dist.zip'
+  });
 
-	const authenticateCommand = vscode.commands.registerCommand('forge.authenticate', () => authenticate(context.secrets));
-	context.subscriptions.push(authenticateCommand);
+  if (!path) {
+    vscode.window.showErrorMessage("File path is required.");
+    return;
+  }
 
-	const listSiteCommand = vscode.commands.registerCommand('forge.listSites', () => listSites(context.secrets));
-	context.subscriptions.push(listSiteCommand);
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('forge-quick-access.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from forge-quick-access!');
-	});
+	const filePath = `${workspaceFolder.uri.fsPath}/${path}`
 
-	context.subscriptions.push(disposable);
+  if (!fs.existsSync(filePath)) {
+    vscode.window.showErrorMessage(`File not found: ${filePath}`);
+    return;
+  }
+
+  try {
+    const token = vscode.workspace.getConfiguration().get('forgeQuickAccess.accountToken');
+
+    if (!token) {
+      vscode.window.showErrorMessage("Forge token is not configured.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('token', token);
+    formData.append('domain', domain);
+    formData.append('site', fs.createReadStream(filePath));
+
+    const response = await axios.post('https://getforge.com/api/cli/deploy', formData, {
+      headers: {
+        ...formData.getHeaders()
+      }
+    });
+
+		console.log('response', response);
+
+    vscode.window.showInformationMessage("Deployment successful!");
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      vscode.window.showErrorMessage(`Deployment error: ${error.message}`);
+    } else {
+      vscode.window.showErrorMessage('Deployment error: An unknown error occurred.');
+    }
+  }
 }
 
-// This method is called when your extension is deactivated
+export function activate(context: vscode.ExtensionContext) {
+  const authenticateCommand = vscode.commands.registerCommand('forge.authenticate', () => authenticate(context.secrets));
+  const deployCommand = vscode.commands.registerCommand('forge.deploy', () => deploy(context.secrets));
+	const listSiteCommand = vscode.commands.registerCommand('forge.listSites', () => listSites(context.secrets));
+	
+  context.subscriptions.push(authenticateCommand);
+	context.subscriptions.push(listSiteCommand);
+  context.subscriptions.push(deployCommand);
+}
+
 export function deactivate() {}
+
+
