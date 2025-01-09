@@ -23,6 +23,16 @@
         "title": "Forge: List Sites"
       }
     ],
+    "configuration": {
+      "title": "Forge Quick Access",
+      "properties": {
+        "forgeQuickAccess.accountToken": {
+          "type": "string",
+          "default": "zvXoE36QrN5F2toBwR4a",
+          "description": "Forge Account Token"
+        }
+      }
+    },
     "activationEvents": ["onCommand:forge.authenticate"]
   },
   "scripts": {

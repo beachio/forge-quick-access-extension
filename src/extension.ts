@@ -45,26 +45,13 @@ export async function authenticate(secretStorage: vscode.SecretStorage) {
 }
 
 export async function listSites(secretStorage: vscode.SecretStorage) {
-	const email = await secretStorage.get('forgeEmail');
-	const accessToken = await secretStorage.get('forgeAccessToken');
-	if (!email || !accessToken) {
-			vscode.window.showErrorMessage("You must authenticate first.");
-			return;
-	}
+	const token = vscode.workspace.getConfiguration().get('forgeQuickAccess.accountToken');
+	const url = `https://getforge.com/api/cli/sites?token=${token}`;
 
 	try {
-			const response = await axios.get('https://getforge.com/internal_api/sites', {
-					headers: {
-							'x-user-email': email,
-							'x-user-token': accessToken
-					}
-			});
-
-			console.log('res data', response.data)
-
-			const sites = response.data.sites || [];
+			const response = await axios.get(url);
 			const selectedSite = await vscode.window.showQuickPick(
-					sites.map((site: any) => site.site_name),
+					response.data,
 					{ placeHolder: "Select a site" }
 			);
 
