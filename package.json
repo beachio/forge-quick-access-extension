@@ -1,7 +1,7 @@
 {
   "name": "forge-quick-access",
   "displayName": "forge-quick-access",
-  "description": "",
+  "description": "A VS Code extension to authenticate with Forge, list sites, and deploy files.",
   "publisher": "beachio",
   "version": "0.0.1",
   "engines": {
@@ -28,18 +28,20 @@
       }
     ],
     "configuration": {
-      "title": "Forge Quick Access",
+      "type": "object",
+      "title": "Forge Quick Access Configuration",
       "properties": {
-        "forgeQuickAccess.accountToken": {
+        "forgeQuickAccess.forgeToken": {
           "type": "string",
-          "default": "zvXoE36QrN5F2toBwR4a",
-          "description": "Forge Account Token"
+          "default": "",
+          "description": "Store Forge API token"
         }
       }
-    },
-    "activationEvents": [
-      "onCommand:forge.authenticate"
-    ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beachio/forge-quick-access-extension.git"
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
@@ -53,7 +55,6 @@
     "@types/axios": "^0.14.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
     "@vscode/test-cli": "^0.0.10",

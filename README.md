@@ -1,71 +1,53 @@
-# forge-quick-access README
+# Forge Quick Access
 
-This is the README for your extension "forge-quick-access". After writing up a brief description, we recommend including the following sections.
+Forge Quick Access is a Visual Studio Code extension that allows you to authenticate with Forge, list sites, and deploy files directly from the editor.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Authenticate with Forge
+- List Forge sites
+- Deploy files to Forge
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Visual Studio Code version 1.96.0 or higher
+- A Forge account
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- `forgeQuickAccess.forgeToken`: Store Forge API token
+
+## Commands
+
+This extension provides the following commands:
+
+- `Forge: Authenticate`: Authenticate with Forge
+- `Forge: List Sites`: List all sites in your Forge account
+- `Forge: Deploy`: Deploy a file to Forge
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- None at the moment
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
+- Initial release of Forge Quick Access
 
-Initial release of ...
+## Getting Started
 
-### 1.0.1
+1. Install the extension from the Visual Studio Code Marketplace or download the `.vsix` file and install it manually.
+2. Open the Command Palette (`Ctrl+Shift+P`) and run `Forge: Authenticate` to authenticate with your Forge account.
+3. Use `Forge: List Sites` to list all sites in your Forge account.
+4. Use `Forge: Deploy` to deploy a file to Forge.
 
-Fixed issue #.
+## Contributing
 
-### 1.1.0
+If you have any suggestions or find any issues, please open an issue or submit a pull request on the [GitHub repository](https://github.com/your-repo/forge-quick-access).
 
-Added features X, Y, and Z.
+## License
 
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+MIT
