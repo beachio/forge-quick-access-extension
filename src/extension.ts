@@ -109,7 +109,7 @@ export async function deploy(secretStorage: vscode.SecretStorage) {
     const formData = new FormData();
     formData.append('token', token);
     formData.append('domain', domain);
-    formData.append('site', fs.createReadStream(filePath));
+    formData.append('archive', fs.createReadStream(filePath));
 
     const response = await axios.post('https://getforge.com/api/cli/deploy', formData, {
       headers: {
